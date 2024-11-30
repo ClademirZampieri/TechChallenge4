@@ -37,19 +37,16 @@ jobs:
       - name: Deploy FrontEnd to Kubernetes
         shell: powershell
         run: |
-          # Definir a variável de ambiente KUBECONFIG
           $env:KUBECONFIG = "$PWD\kubeconfig"
-
-          # Verificar o contexto atual
           kubectl config use-context docker-desktop
-
-          # Aplicar os recursos no Kubernetes
           kubectl apply -k .\Kubernetes\frontend
 
       - name: Deploy API to Kubernetes
+        shell: powershell
         run: |
           kubectl apply -k ./Kubernetes/webapi
 
       - name: Deploy Another Service to Kubernetes
+        shell: powershell
         run: |
           kubectl apply -k ./Kubernetes/application
