@@ -101,16 +101,7 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
-
-      - name: Debug: Check if KUBECONFIG_DATA exists
-        run: |
-          if [ -z "${{ secrets.KUBECONFIG_DATA }}" ]; then
-            echo "ERROR: KUBECONFIG_DATA is empty or not set. Please check your GitHub secrets."
-            exit 1
-          else
-            echo "KUBECONFIG_DATA is set."
-          fi
-
+      
       - name: Set up kubectl
         env:
           KUBECONFIG_DATA: ${{ secrets.KUBECONFIG_DATA }}
