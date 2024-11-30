@@ -53,6 +53,9 @@ jobs:
           dotnet-version: '8.x'
           include-prerelease: true
 
+      - name: Pull SQL Server Image
+        run: docker pull mcr.microsoft.com/mssql/server:2022-latest
+
       - name: Test API with dotnet
         run: dotnet test ./TechChallenge.Domain.IntegrationTest/TechChallenge.Domain.IntegrationTest.csproj --configuration Release
 
