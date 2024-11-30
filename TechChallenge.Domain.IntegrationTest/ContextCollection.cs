@@ -13,7 +13,7 @@ public class ContextFixture : IAsyncLifetime
 {
     public techchallengeDbContext _context { get; private set; }
     private readonly MsSqlContainer _msSqlContainer = new MsSqlBuilder()
-        .WithImage("mcr.microsoft.com/mssql/server:2022-latest")
+        .WithImage("mcr.microsoft.com/windows/servercore:ltsc2022")
         .Build();
 
     public async Task InitializeAsync()
