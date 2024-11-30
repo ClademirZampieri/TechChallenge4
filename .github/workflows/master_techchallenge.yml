@@ -142,18 +142,18 @@ jobs:
 
       - name: Build and push API Docker image
         run: |
-          docker build -t http://zampieri.sytes.net:5000/api-front-tech-challenge:latest -f ./DevOps/webapi/Dockerfile .
-          docker push http://zampieri.sytes.net:5000/api-front-tech-challenge:latest
+          docker build -t zampieri.sytes.net:5000/api-front-tech-challenge:latest -f ./DevOps/webapi/Dockerfile .
+          docker push zampieri.sytes.net:5000/api-front-tech-challenge:latest
 
       - name: Build and push FrontEnd Docker image
         run: |
-          docker build -t http://zampieri.sytes.net:5000/front-tech-challenge:latest -f ./DevOps/webapi/Dockerfile .
-          docker push http://zampieri.sytes.net:5000/front-tech-challenge:latest
+          docker build -t /zampieri.sytes.net:5000/front-tech-challenge:latest -f ./DevOps/webapi/Dockerfile .
+          docker push zampieri.sytes.net:5000/front-tech-challenge:latest
 
       - name: Build and push FrontEnd Docker image
         run: |
-          docker build -t http://zampieri.sytes.net:5000/front-tech-challenge:latest -f ./DevOps/webapi/Dockerfile .
-          docker push http://zampieri.sytes.net:5000/front-tech-challenge:latest
+          docker build -t zampieri.sytes.net:5000/front-tech-challenge:latest -f ./DevOps/webapi/Dockerfile .
+          docker push zampieri.sytes.net:5000/front-tech-challenge:latest
 
   deploy-to-kubernetes:
     runs-on: ubuntu-latest
