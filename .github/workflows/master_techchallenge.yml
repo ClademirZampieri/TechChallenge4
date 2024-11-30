@@ -83,7 +83,7 @@ jobs:
 
       - name: Build and push API image
         run: |
-          docker build -t ${{ secrets.DOCKER_HUB_USERNAME }}/api-front-tech-challenge:latest -f ./DevOps/webapi/DockerFile
+          docker build -t ${{ secrets.DOCKER_HUB_USERNAME }}/api-front-tech-challenge:latest -f ./DevOps/webapi/Dockerfile .
           docker push ${{ secrets.DOCKER_HUB_USERNAME }}/api-front-tech-challenge:latest
 
   build-push-front-to-dockerhub:
@@ -104,7 +104,7 @@ jobs:
 
       - name: Build and push FrontEnd image
         run: |
-          docker build -t ${{ secrets.DOCKER_HUB_USERNAME }}/front-tech-challenge:latest -f ./Devops/frontend/DockerFile
+          docker build -t ${{ secrets.DOCKER_HUB_USERNAME }}/front-tech-challenge:latest -f ./Devops/frontend/Dockerfile .
           docker push ${{ secrets.DOCKER_HUB_USERNAME }}/front-tech-challenge:latest
 
 
@@ -126,7 +126,7 @@ jobs:
 
       - name: Build and push Application image
         run: |
-          docker build -t ${{ secrets.DOCKER_HUB_USERNAME }}/application-tech-challenge:latest -f ./Devops/application/DockerFile
+          docker build -t ${{ secrets.DOCKER_HUB_USERNAME }}/application-tech-challenge:latest -f ./Devops/application/Dockerfile .
           docker push ${{ secrets.DOCKER_HUB_USERNAME }}/application-tech-challenge:latest
 
           
