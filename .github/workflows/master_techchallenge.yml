@@ -36,12 +36,12 @@ jobs:
 
       - name: Deploy FrontEnd to Kubernetes
         run: |
-          kubectl --server=https://localhost:6443 apply -k ./Kubernetes/frontend
+          kubectl apply -k ./Kubernetes/frontend
 
       - name: Deploy API to Kubernetes
         run: |
-          kubectl --server=https://localhost:6443 apply -k ./Kubernetes/webapi
+          kubectl apply -k ./Kubernetes/webapi
 
       - name: Deploy Another Service to Kubernetes
         run: |
-          kubectl --server=https://localhost:6443 apply -k ./Kubernetes/application
+          kubectl apply -k ./Kubernetes/application
