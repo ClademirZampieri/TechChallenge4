@@ -174,8 +174,14 @@ jobs:
         env:
           KUBECONFIG_DATA: ${{ secrets.KUBECONFIG_DATA }}
         run: |
-          echo "${KUBECONFIG_DATA}" | base64 -d > kubeconfig
-          export KUBECONFIG=kubeconfig
+          # Decode the kubeconfig data using PowerShell
+          $decodedKubeconfig = [System.Text.Encoding]::UTF8.GetString([Convert]::FromBase64String("${{ env.KUBECONFIG_DATA }}"))
+          $decodedKubeconfig | Out-File -FilePath kubeconfig -Encoding UTF8
+
+          # Set the kubeconfig environment variable
+          $env:KUBECONFIG = ".\kubeconfig"
+
+          # Test kubectl connectivity
           kubectl cluster-info
 
       - name: Deploy FrontEnd to Kubernetes
@@ -189,3 +195,4 @@ jobs:
       - name: Deploy Another Service to Kubernetes
         run: |
           kubectl apply -k ./Kubernates/application
+
