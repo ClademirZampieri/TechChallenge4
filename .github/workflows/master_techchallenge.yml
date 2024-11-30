@@ -1,4 +1,4 @@
-name: Build, test, and deploy to Kubernetes
+name: Build, test, and deploy to k8s
 
 on:
   push:
@@ -65,7 +65,7 @@ jobs:
         if: ${{ 1 != 1 }} 
         run: dotnet test ./TechChallenge.Domain.IntegrationTest/TechChallenge.Domain.IntegrationTest.csproj --configuration Release
 
-  build-push-api-to-dockerhub:
+  push-api-to-dockerhub:
     runs-on: ubuntu-latest
     needs: [unit-test, integration-test]
 
@@ -86,7 +86,7 @@ jobs:
           docker build -t ${{ secrets.DOCKER_HUB_USERNAME }}/api-front-tech-challenge:latest -f ./DevOps/webapi/Dockerfile .
           docker push ${{ secrets.DOCKER_HUB_USERNAME }}/api-front-tech-challenge:latest
 
-  build-push-front-to-dockerhub:
+  push-front-to-dockerhub:
     runs-on: ubuntu-latest
     needs: [unit-test, integration-test]
 
@@ -108,7 +108,7 @@ jobs:
           docker push ${{ secrets.DOCKER_HUB_USERNAME }}/front-tech-challenge:latest
 
 
-  build-push-application-to-dockerhub:
+  push-application-to-dockerhub:
       runs-on: ubuntu-latest
       needs: [unit-test, integration-test]
 
@@ -130,7 +130,7 @@ jobs:
           docker push ${{ secrets.DOCKER_HUB_USERNAME }}/application-tech-challenge:latest
 
           
-  build-and-push-images:
+  push-images_to_k8s:
     runs-on: ubuntu-latest
     needs: [unit-test, integration-test]
 
@@ -160,8 +160,8 @@ jobs:
           docker build -t zampieri.sytes.net:5000/application-tech-challenge:latest -f ./DevOps/application/Dockerfile .
           docker push zampieri.sytes.net:5000/application-tech-challenge:latest
 
-  deploy-to-kubernetes:
-    needs: [build-and-push-images]
+  deploy-to-k8s:
+    needs: [push-images_to_k8s]
     runs-on: self-hosted
 
     steps:
@@ -188,21 +188,21 @@ jobs:
           # Test kubectl connectivity
           kubectl cluster-info
 
-      - name: Deploy FrontEnd to Kubernetes
+      - name: Deploy FrontEnd to k8s
         shell: powershell
         run: |
           $env:KUBECONFIG = "$PWD\kubeconfig"
           kubectl config use-context docker-desktop
           kubectl apply -k .\Kubernetes\frontend
 
-      - name: Deploy API to Kubernetes
+      - name: Deploy API to k8s
         shell: powershell
         run: |
           $env:KUBECONFIG = "$PWD\kubeconfig"
           kubectl config use-context docker-desktop
           kubectl apply -k ./Kubernetes/webapi
 
-      - name: Deploy Another Service to Kubernetes
+      - name: Deploy Another Service to k8s
         shell: powershell
         run: |
           $env:KUBECONFIG = "$PWD\kubeconfig"
