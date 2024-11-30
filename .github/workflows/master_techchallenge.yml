@@ -37,7 +37,7 @@ jobs:
           include-prerelease: true
 
       - name: Test API with dotnet
-        if: ${{ 1 != 1 }}
+        if: ${{ 1 != 1 }} 
         run: dotnet test ./TechChallenge.Domain.UnitTest/TechChallenge.Domain.UnitTest.csproj --configuration Release
 
   integration-test:
@@ -62,9 +62,74 @@ jobs:
         shell: pwsh
 
       - name: Test API with dotnet
-        if: ${{ 1 != 1 }}
+        if: ${{ 1 != 1 }} 
         run: dotnet test ./TechChallenge.Domain.IntegrationTest/TechChallenge.Domain.IntegrationTest.csproj --configuration Release
 
+  build-push-api-to-dockerhub:
+    runs-on: ubuntu-latest
+    needs: [unit-test, integration-test]
+
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v1
+
+      - name: Login to DockerHub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKER_HUB_USERNAME }}
+          password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
+
+      - name: Build and push API image
+        run: |
+          docker build -t ${{ secrets.DOCKER_HUB_USERNAME }}/api-front-tech-challenge:latest -f ./DevOps/webapi/Dockerfile .
+          docker push ${{ secrets.DOCKER_HUB_USERNAME }}/api-front-tech-challenge:latest
+
+  build-push-front-to-dockerhub:
+    runs-on: ubuntu-latest
+    needs: [unit-test, integration-test]
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v1
+
+      - name: Login to DockerHub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKER_HUB_USERNAME }}
+          password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
+
+      - name: Build and push FrontEnd image
+        run: |
+          docker build -t ${{ secrets.DOCKER_HUB_USERNAME }}/front-tech-challenge:latest -f ./DevOps/frontend/Dockerfile .
+          docker push ${{ secrets.DOCKER_HUB_USERNAME }}/front-tech-challenge:latest
+
+
+  build-push-application-to-dockerhub:
+      runs-on: ubuntu-latest
+      needs: [unit-test, integration-test]
+
+      steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v1
+
+      - name: Login to DockerHub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKER_HUB_USERNAME }}
+          password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
+
+      - name: Build and push Application image
+        run: |
+          docker build -t ${{ secrets.DOCKER_HUB_USERNAME }}/application-tech-challenge:latest -f ./DevOps/application/Dockerfile .
+          docker push ${{ secrets.DOCKER_HUB_USERNAME }}/application-tech-challenge:latest
+
+          
   build-and-push-images:
     runs-on: ubuntu-latest
     needs: [unit-test, integration-test]
@@ -101,44 +166,36 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
-      
+
       - name: Set up kubectl
         env:
           KUBECONFIG_DATA: ${{ secrets.KUBECONFIG_DATA }}
         run: |
-          echo "Decoding KUBECONFIG_DATA..."
-          echo "${KUBECONFIG_DATA}" | base64 -d > kubeconfig
-          if [ ! -f kubeconfig ]; then
-            echo "ERROR: The kubeconfig file was not created."
-            exit 1
-          fi
-          export KUBECONFIG=$(pwd)/kubeconfig
-          echo "KUBECONFIG set to: $KUBECONFIG"
+          # Decode the kubeconfig data using PowerShell
+          $decodedKubeconfig = [System.Text.Encoding]::UTF8.GetString([Convert]::FromBase64String("${{ env.KUBECONFIG_DATA }}"))
+          if ($decodedKubeconfig) {
+              echo "Kubeconfig decodificado com sucesso:"
+              echo $decodedKubeconfig
+          } else {
+              echo "Falha ao decodificar o kubeconfig."
+              exit 1
+          }
+          $decodedKubeconfig | Out-File -FilePath kubeconfig -Encoding UTF8
+
+          # Set the kubeconfig environment variable
+          $env:KUBECONFIG = ".\kubeconfig"
+
+          # Test kubectl connectivity
           kubectl cluster-info
 
       - name: Deploy FrontEnd to Kubernetes
         run: |
-          echo "Deploying FrontEnd..."
-          kubectl apply -k ./Kubernetes/frontend || {
-            echo "ERROR: Failed to deploy FrontEnd."
-            exit 1
-          }
-          echo "FrontEnd deployment completed successfully."
+          kubectl --server=https://localhost:6443 apply -k ./Kubernetes/frontend
 
       - name: Deploy API to Kubernetes
         run: |
-          echo "Deploying API..."
-          kubectl apply -k ./Kubernetes/webapi || {
-            echo "ERROR: Failed to deploy API."
-            exit 1
-          }
-          echo "API deployment completed successfully."
+          kubectl --server=https://localhost:6443 apply -k ./Kubernetes/webapi
 
-      - name: Deploy Application to Kubernetes
+      - name: Deploy Another Service to Kubernetes
         run: |
-          echo "Deploying Application..."
-          kubectl apply -k ./Kubernetes/application || {
-            echo "ERROR: Failed to deploy Application."
-            exit 1
-          }
-          echo "Application deployment completed successfully."
+          kubectl --server=https://localhost:6443 apply -k ./Kubernetes/application
