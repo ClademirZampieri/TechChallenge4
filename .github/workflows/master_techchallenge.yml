@@ -1,4 +1,4 @@
-name: Build, test, and deploy to Local Kubernetes
+name: Build, test, and deploy to Kubernetes
 
 on:
   push:
