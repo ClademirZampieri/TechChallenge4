@@ -36,6 +36,8 @@ jobs:
 
       - name: Deploy FrontEnd to Kubernetes
         run: |
+          export KUBECONFIG=$PWD/kubeconfig
+          kubectl config use-context docker-desktop
           kubectl apply -k ./Kubernetes/frontend
 
       - name: Deploy API to Kubernetes
