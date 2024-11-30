@@ -1,4 +1,4 @@
-name: Build, test, and deploy ApiFrontTechChallenge and FrontEnd to Local Kubernetes
+name: Build, test, and deploy to Local Kubernetes
 
 on:
   push:
@@ -68,13 +68,13 @@ jobs:
 
       - name: Build and push API Docker image
         run: |
-          docker build -t http://zampieri.sytes.net:5000//api-front-tech-challenge:latest -f ./TechChallenge.API.dockerfile .
-          docker push http://zampieri.sytes.net:5000//api-front-tech-challenge:latest
+          docker build -t localhost:5000/api-front-tech-challenge:latest -f ./TechChallenge.API.dockerfile .
+          docker push localhost:5000/api-front-tech-challenge:latest
 
       - name: Build and push FrontEnd Docker image
         run: |
-          docker build -t http://zampieri.sytes.net:5000//front-tech-challenge:latest -f ./TechChallenge.Web.dockerfile .
-          docker push http://zampieri.sytes.net:5000//front-tech-challenge:latest
+          docker build -t localhost:5000/front-tech-challenge:latest -f ./TechChallenge.Web.dockerfile .
+          docker push localhost:5000/front-tech-challenge:latest
 
   deploy-to-local-kubernetes:
     runs-on: ubuntu-latest
@@ -91,12 +91,14 @@ jobs:
           export KUBECONFIG=kubeconfig
           kubectl cluster-info
 
-      - name: Deploy API to Kubernetes
-        run: |
-          kubectl set image deployment/api-deployment api-container=localhost:5000/api-front-tech-challenge:latest
-          kubectl apply -f ./k8s/api-deployment.yaml
-
       - name: Deploy FrontEnd to Kubernetes
         run: |
-          kubectl set image deployment/frontend-deployment frontend-container=localhost:5000/front-tech-challenge:latest
-          kubectl apply -f ./k8s/frontend-deployment.yaml
+          kubectl apply -k ./Kubernates/frontend
+
+      - name: Deploy API to Kubernetes
+        run: |
+          kubectl apply -k ./Kubernates/webapi
+
+      - name: Deploy Another Service to Kubernetes
+        run: |
+          kubectl apply -k ./Kubernates/application
