@@ -37,7 +37,8 @@ jobs:
           include-prerelease: true
 
       - name: Test API with dotnet
-        #run: dotnet test ./TechChallenge.Domain.UnitTest/TechChallenge.Domain.UnitTest.csproj --configuration Release
+        if: ${{ env.RUN_TESTS != 'false' }} 
+        run: dotnet test ./TechChallenge.Domain.UnitTest/TechChallenge.Domain.UnitTest.csproj --configuration Release
 
   integration-test:
     runs-on: windows-latest
@@ -61,7 +62,8 @@ jobs:
         shell: pwsh
 
       - name: Test API with dotnet
-        #run: dotnet test ./TechChallenge.Domain.IntegrationTest/TechChallenge.Domain.IntegrationTest.csproj --configuration Release
+        if: ${{ env.RUN_TESTS != 'false' }} 
+        run: dotnet test ./TechChallenge.Domain.IntegrationTest/TechChallenge.Domain.IntegrationTest.csproj --configuration Release
 
   build-push-api-to-dockerhub:
     runs-on: ubuntu-latest
