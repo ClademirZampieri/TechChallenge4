@@ -35,7 +35,7 @@ jobs:
           kubectl cluster-info
 
       - name: Deploy FrontEnd to Kubernetes
-        shell: pwsh
+        shell: powershell
         run: |
           # Definir a variável de ambiente KUBECONFIG
           $env:KUBECONFIG = "$PWD\kubeconfig"
