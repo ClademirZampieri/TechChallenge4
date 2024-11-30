@@ -13,10 +13,10 @@ public class ContextFixture : IAsyncLifetime
 {
     public techchallengeDbContext _context { get; private set; }
     private readonly MsSqlContainer _msSqlContainer = new MsSqlBuilder()
-    .WithImage("mcr.microsoft.com/windows/servercore:ltsc2022")
-    .WithWaitStrategy(Wait.ForUnixContainer().UntilPortIsAvailable(1433)) // Verifica a porta 1433
-    .WithStartupTimeout(TimeSpan.FromMinutes(2)) // Aumenta o tempo limite de inicialização
-    .Build();
+        .WithImage("mcr.microsoft.com/mssql/server:2022-CU13-windowsservercore-ltsc2022")
+        .WithWaitStrategy(Wait.ForWindowsContainer().UntilPortIsAvailable(1433))
+        .WithStartupTimeout(TimeSpan.FromMinutes(5)) // Aumenta o timeout
+        .Build();
 
     public async Task InitializeAsync()
     {
