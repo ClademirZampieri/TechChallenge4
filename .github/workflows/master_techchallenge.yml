@@ -104,7 +104,7 @@ jobs:
 
       - name: Build and push FrontEnd image
         run: |
-          docker build -t ${{ secrets.DOCKER_HUB_USERNAME }}/front-tech-challenge:latest -f ./Devops/frontend/Dockerfile .
+          docker build -t ${{ secrets.DOCKER_HUB_USERNAME }}/front-tech-challenge:latest -f ./DevOps/frontend/Dockerfile .
           docker push ${{ secrets.DOCKER_HUB_USERNAME }}/front-tech-challenge:latest
 
 
@@ -126,7 +126,7 @@ jobs:
 
       - name: Build and push Application image
         run: |
-          docker build -t ${{ secrets.DOCKER_HUB_USERNAME }}/application-tech-challenge:latest -f ./Devops/application/Dockerfile .
+          docker build -t ${{ secrets.DOCKER_HUB_USERNAME }}/application-tech-challenge:latest -f ./DevOps/application/Dockerfile .
           docker push ${{ secrets.DOCKER_HUB_USERNAME }}/application-tech-challenge:latest
 
           
@@ -142,17 +142,17 @@ jobs:
 
       - name: Build and push API Docker image
         run: |
-          docker build -t localhost:5000/api-front-tech-challenge:latest -f ./TechChallenge.API.dockerfile .
+          docker build -t localhost:5000/api-front-tech-challenge:latest -f ./DevOps/webapi/Dockerfile .
           docker push http://zampieri.sytes.net:5000/api-front-tech-challenge:latest
 
       - name: Build and push FrontEnd Docker image
         run: |
-          docker build -t localhost:5000/front-tech-challenge:latest -f ./TechChallenge.Web.dockerfile .
+          docker build -t localhost:5000/front-tech-challenge:latest -f ./DevOps/webapi/Dockerfile .
           docker push http://zampieri.sytes.net:5000/front-tech-challenge:latest
 
       - name: Build and push FrontEnd Docker image
         run: |
-          docker build -t localhost:5000/front-tech-challenge:latest -f ./TechChallenge.Web.dockerfile .
+          docker build -t localhost:5000/front-tech-challenge:latest -f ./DevOps/webapi/Dockerfile .
           docker push http://zampieri.sytes.net:5000/front-tech-challenge:latest
 
   deploy-to-kubernetes:
