@@ -68,13 +68,13 @@ jobs:
 
       - name: Build and push API Docker image
         run: |
-          docker build -t localhost:5000/api-front-tech-challenge:latest -f ./TechChallenge.API.dockerfile .
-          docker push localhost:5000/api-front-tech-challenge:latest
+          docker build -t http://zampieri.sytes.net:5000//api-front-tech-challenge:latest -f ./TechChallenge.API.dockerfile .
+          docker push http://zampieri.sytes.net:5000//api-front-tech-challenge:latest
 
       - name: Build and push FrontEnd Docker image
         run: |
-          docker build -t localhost:5000/front-tech-challenge:latest -f ./TechChallenge.Web.dockerfile .
-          docker push localhost:5000/front-tech-challenge:latest
+          docker build -t http://zampieri.sytes.net:5000//front-tech-challenge:latest -f ./TechChallenge.Web.dockerfile .
+          docker push http://zampieri.sytes.net:5000//front-tech-challenge:latest
 
   deploy-to-local-kubernetes:
     runs-on: ubuntu-latest
