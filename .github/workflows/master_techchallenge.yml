@@ -60,12 +60,74 @@ jobs:
         run: docker run -e "ACCEPT_EULA=Y" -e "SA_PASSWORD=YourStrongPassword123!" -p 1433:1433 -d --name sql-server mcr.microsoft.com/windows/servercore:ltsc2022
         shell: pwsh
 
-      - name: Wait for SQL Server to Initialize
-        run: sleep 30
-
       - name: Test API with dotnet
         run: dotnet test ./TechChallenge.Domain.IntegrationTest/TechChallenge.Domain.IntegrationTest.csproj --configuration Release
 
+  build-push-api-to-dockerhub:
+    runs-on: ubuntu-latest
+    needs: [unit-test, integration-test]
+
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v1
+
+      - name: Login to DockerHub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKER_HUB_USERNAME }}
+          password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
+
+      - name: Build and push API image
+        run: |
+          docker build -t ${{ secrets.DOCKER_HUB_USERNAME }}/api-front-tech-challenge:latest -f ./DevOps/webapi .
+          docker push ${{ secrets.DOCKER_HUB_USERNAME }}/api-front-tech-challenge:latest
+
+  build-push-front-to-dockerhub:
+    runs-on: ubuntu-latest
+    needs: [unit-test, integration-test]
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v1
+
+      - name: Login to DockerHub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKER_HUB_USERNAME }}
+          password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
+
+      - name: Build and push FrontEnd image
+        run: |
+          docker build -t ${{ secrets.DOCKER_HUB_USERNAME }}/front-tech-challenge:latest -f ./Devops/frontend .
+          docker push ${{ secrets.DOCKER_HUB_USERNAME }}/front-tech-challenge:latest
+
+
+  build-push-application-to-dockerhub:
+      runs-on: ubuntu-latest
+      needs: [unit-test, integration-test]
+
+      steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v1
+
+      - name: Login to DockerHub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKER_HUB_USERNAME }}
+          password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
+
+      - name: Build and push Application image
+        run: |
+          docker build -t ${{ secrets.DOCKER_HUB_USERNAME }}/application-tech-challenge:latest -f ./Devops/application .
+          docker push ${{ secrets.DOCKER_HUB_USERNAME }}/application-tech-challenge:latest
+
+          
   build-and-push-images:
     runs-on: ubuntu-latest
     needs: [unit-test, integration-test]
@@ -79,12 +141,17 @@ jobs:
       - name: Build and push API Docker image
         run: |
           docker build -t localhost:5000/api-front-tech-challenge:latest -f ./TechChallenge.API.dockerfile .
-          docker push localhost:5000/api-front-tech-challenge:latest
+          docker push http://zampieri.sytes.net:5000/api-front-tech-challenge:latest
 
       - name: Build and push FrontEnd Docker image
         run: |
           docker build -t localhost:5000/front-tech-challenge:latest -f ./TechChallenge.Web.dockerfile .
-          docker push localhost:5000/front-tech-challenge:latest
+          docker push http://zampieri.sytes.net:5000/front-tech-challenge:latest
+
+      - name: Build and push FrontEnd Docker image
+        run: |
+          docker build -t localhost:5000/front-tech-challenge:latest -f ./TechChallenge.Web.dockerfile .
+          docker push http://zampieri.sytes.net:5000/front-tech-challenge:latest
 
   deploy-to-local-kubernetes:
     runs-on: ubuntu-latest
