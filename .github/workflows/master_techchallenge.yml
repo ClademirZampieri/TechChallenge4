@@ -57,10 +57,8 @@ jobs:
         run: docker pull mcr.microsoft.com/windows/servercore:ltsc2022
 
       - name: Run SQL Server Container
-        run: |
-          docker run -e 'ACCEPT_EULA=Y' -e 'SA_PASSWORD=YourStrongPassword123!' \
-            -p 1433:1433 -d --name sql-server \
-            mcr.microsoft.com/mssql/server:2022-latest
+        run: docker run -e "ACCEPT_EULA=Y" -e "SA_PASSWORD=YourStrongPassword123!" -p 1433:1433 -d --name sql-server mcr.microsoft.com/mssql/server:2022-latest
+        shell: pwsh
 
       - name: Wait for SQL Server to Initialize
         run: sleep 30
