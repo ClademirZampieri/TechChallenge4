@@ -37,7 +37,7 @@ jobs:
           include-prerelease: true
 
       - name: Test API with dotnet
-        if: ${{ 1 != 1 }} 
+        if: ${{ 1 != 1 }}
         run: dotnet test ./TechChallenge.Domain.UnitTest/TechChallenge.Domain.UnitTest.csproj --configuration Release
 
   integration-test:
@@ -62,7 +62,7 @@ jobs:
         shell: pwsh
 
       - name: Test API with dotnet
-        if: ${{ 1 != 1 }} 
+        if: ${{ 1 != 1 }}
         run: dotnet test ./TechChallenge.Domain.IntegrationTest/TechChallenge.Domain.IntegrationTest.csproj --configuration Release
 
   build-and-push-images:
@@ -115,33 +115,20 @@ jobs:
         env:
           KUBECONFIG_DATA: ${{ secrets.KUBECONFIG_DATA }}
         run: |
-          # Decode the kubeconfig data using PowerShell
           echo "Decoding KUBECONFIG_DATA..."
-          $decodedKubeconfig = [System.Text.Encoding]::UTF8.GetString([Convert]::FromBase64String("${{ env.KUBECONFIG_DATA }}"))
-          $decodedKubeconfig | Out-File -FilePath kubeconfig -Encoding UTF8
-
-          # Check if the kubeconfig file was created
-          if (-Not (Test-Path -Path "kubeconfig")) {
+          echo "${KUBECONFIG_DATA}" | base64 -d > kubeconfig
+          if [ ! -f kubeconfig ]; then
             echo "ERROR: The kubeconfig file was not created."
             exit 1
-          } else {
-            echo "The kubeconfig file was created successfully."
           fi
-
-          # Set KUBECONFIG environment variable
-          $env:KUBECONFIG = ".\kubeconfig"
-          echo "KUBECONFIG set to: $env:KUBECONFIG"
-
-          # Test kubectl connectivity
-          kubectl cluster-info || {
-            echo "ERROR: Unable to connect to the Kubernetes cluster. Check your kubeconfig."
-            exit 1
-          }
+          export KUBECONFIG=$(pwd)/kubeconfig
+          echo "KUBECONFIG set to: $KUBECONFIG"
+          kubectl cluster-info
 
       - name: Deploy FrontEnd to Kubernetes
         run: |
-          echo "Deploying FrontEnd resources to Kubernetes..."
-          kubectl --server=https://localhost:6443 apply -k ./Kubernetes/frontend || {
+          echo "Deploying FrontEnd..."
+          kubectl apply -k ./Kubernetes/frontend || {
             echo "ERROR: Failed to deploy FrontEnd."
             exit 1
           }
@@ -149,8 +136,8 @@ jobs:
 
       - name: Deploy API to Kubernetes
         run: |
-          echo "Deploying API resources to Kubernetes..."
-          kubectl --server=https://localhost:6443 apply -k ./Kubernetes/webapi || {
+          echo "Deploying API..."
+          kubectl apply -k ./Kubernetes/webapi || {
             echo "ERROR: Failed to deploy API."
             exit 1
           }
@@ -158,8 +145,8 @@ jobs:
 
       - name: Deploy Application to Kubernetes
         run: |
-          echo "Deploying Application resources to Kubernetes..."
-          kubectl --server=https://localhost:6443 apply -k ./Kubernetes/application || {
+          echo "Deploying Application..."
+          kubectl apply -k ./Kubernetes/application || {
             echo "ERROR: Failed to deploy Application."
             exit 1
           }
