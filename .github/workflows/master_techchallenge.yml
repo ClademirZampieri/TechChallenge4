@@ -44,9 +44,13 @@ jobs:
       - name: Deploy API to Kubernetes
         shell: powershell
         run: |
+          $env:KUBECONFIG = "$PWD\kubeconfig"
+          kubectl config use-context docker-desktop
           kubectl apply -k ./Kubernetes/webapi
 
       - name: Deploy Another Service to Kubernetes
         shell: powershell
         run: |
+          $env:KUBECONFIG = "$PWD\kubeconfig"
+          kubectl config use-context docker-desktop
           kubectl apply -k ./Kubernetes/application
