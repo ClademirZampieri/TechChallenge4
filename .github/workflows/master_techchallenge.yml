@@ -161,6 +161,7 @@ jobs:
           docker push zampieri.sytes.net:5000/application-tech-challenge:latest
 
   deploy-to-kubernetes:
+    needs: [build-and-push-images]
     runs-on: self-hosted
 
     steps:
