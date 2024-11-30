@@ -1,5 +1,8 @@
 name: Build, test, and deploy to Kubernetes
 
+env:
+  RUN_TESTS: false
+  
 on:
   push:
     branches:
@@ -152,13 +155,13 @@ jobs:
 
       - name: Build and push FrontEnd Docker image
         run: |
-          docker build -t /zampieri.sytes.net:5000/front-tech-challenge:latest -f ./DevOps/webapi/Dockerfile .
+          docker build -t /zampieri.sytes.net:5000/front-tech-challenge:latest -f ./DevOps/frontend/Dockerfile .
           docker push zampieri.sytes.net:5000/front-tech-challenge:latest
 
-      - name: Build and push FrontEnd Docker image
+      - name: Build and push Application Docker image
         run: |
-          docker build -t zampieri.sytes.net:5000/front-tech-challenge:latest -f ./DevOps/webapi/Dockerfile .
-          docker push zampieri.sytes.net:5000/front-tech-challenge:latest
+          docker build -t zampieri.sytes.net:5000/application-tech-challenge:latest -f ./DevOps/application/Dockerfile .
+          docker push zampieri.sytes.net:5000/application-tech-challenge:latest
 
   deploy-to-kubernetes:
     runs-on: ubuntu-latest
